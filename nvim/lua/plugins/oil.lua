@@ -12,8 +12,10 @@ local function set_oil_highlights()
 	-- Monokai Pro grays: #c1c0c0 dimmed1 · #939293 dimmed2 · #727072 dimmed3 · #5b595c dimmed4.
 	vim.api.nvim_set_hl(0, "OilFloatBorder", { fg = "#939293", bg = "#272822" })
 	-- Folders otherwise show a #221f22 highlight box; match the float background.
-	vim.api.nvim_set_hl(0, "OilDir", { fg = "#727072", bg = "#272822" })
-	vim.api.nvim_set_hl(0, "OilDirIcon", { fg = "#727072", bg = "#272822" })
+	-- fg #c1c0c0 (Monokai Pro dimmed1) keeps folder names readable but a notch
+	-- below the bright white (#fcfcfa) file names.
+	vim.api.nvim_set_hl(0, "OilDir", { fg = "#c1c0c0", bg = "#272822" })
+	vim.api.nvim_set_hl(0, "OilDirIcon", { fg = "#c1c0c0", bg = "#272822" })
 end
 set_oil_highlights()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = set_oil_highlights })
