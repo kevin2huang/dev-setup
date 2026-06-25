@@ -40,7 +40,7 @@ return {
 
 			require("lualine").setup({
 				options = {
-					theme = "catppuccin",
+					theme = "monokai-pro",
 					globalstatus = true,
 					component_separators = { left = "", right = "" },
 					section_separators = { left = "█", right = "█" },

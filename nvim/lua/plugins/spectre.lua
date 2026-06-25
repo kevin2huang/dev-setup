@@ -6,13 +6,16 @@ return {
 		cmd = { "Spectre" },
 		dependencies = {
 			"nvim-lua/plenary.nvim",
-			"catppuccin/nvim",
+			"loctvl842/monokai-pro.nvim",
 		},
 		config = function()
-			local theme = require("catppuccin.palettes").get_palette("mocha")
+			-- Monokai Pro palette (background overridden to #272822)
+			local red = "#ff6188"
+			local green = "#a9dc76"
+			local base = "#272822"
 
-			vim.api.nvim_set_hl(0, "SpectreSearch", { bg = theme.red, fg = theme.base })
-			vim.api.nvim_set_hl(0, "SpectreReplace", { bg = theme.green, fg = theme.base })
+			vim.api.nvim_set_hl(0, "SpectreSearch", { bg = red, fg = base })
+			vim.api.nvim_set_hl(0, "SpectreReplace", { bg = green, fg = base })
 
 			require("spectre").setup({
 				highlight = {

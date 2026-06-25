@@ -8,20 +8,22 @@ return {
 			"?",
 		},
 		dependencies = {
-			"catppuccin/nvim",
+			"loctvl842/monokai-pro.nvim",
 		},
 		build = function()
 			vim.fn["UpdateRemotePlugins"]()
 		end,
 		config = function()
 			local wilder = require("wilder")
-			local mocha = require("catppuccin.palettes").get_palette("mocha")
+			-- Monokai Pro palette
+			local text = "#fcfcfa"
+			local mauve = "#ab9df2"
 
 			-- Create a highlight group for the popup menu
 			local text_highlight =
-				wilder.make_hl("WilderText", { { a = 1 }, { a = 1 }, { foreground = mocha.text } })
+				wilder.make_hl("WilderText", { { a = 1 }, { a = 1 }, { foreground = text } })
 			local mauve_highlight =
-				wilder.make_hl("WilderMauve", { { a = 1 }, { a = 1 }, { foreground = mocha.mauve } })
+				wilder.make_hl("WilderMauve", { { a = 1 }, { a = 1 }, { foreground = mauve } })
 
 			-- Enable wilder when pressing :, / or ?
 			wilder.setup({ modes = { ":", "/", "?" } })

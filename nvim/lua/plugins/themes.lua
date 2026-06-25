@@ -1,80 +1,89 @@
-
 return {
 	{
-		"catppuccin/nvim",
+		"loctvl842/monokai-pro.nvim",
 		lazy = false,
 		priority = 1000,
 		config = function()
-			require("catppuccin").setup({
-				integrations = {
-					blink_cmp = true,
-					fidget = true,
-					gitsigns = true,
-					harpoon = true,
-					indent_blankline = {
-						enabled = false,
-						scope_color = "sapphire",
-						colored_indent_levels = false,
-					},
-					mason = true,
-					native_lsp = { enabled = true },
-					noice = true,
-					notify = true,
-					symbols_outline = true,
-					snacks = {
-						enabled = true,
-						indent_scope_color = "mauve",
-					},
-					telescope = true,
-					treesitter = true,
-					treesitter_context = true,
+			require("monokai-pro").setup({
+				-- "pro" is the default Monokai Pro palette, matching
+				-- ~/Documents/themes/monokai_pro.json. Other filters: classic,
+				-- octagon, machine, ristretto, spectrum.
+				filter = "pro",
+				-- Icons are provided by mini.icons (see mini-icons.lua), so the
+				-- built-in nvim-web-devicons recolor integration is off.
+				devicons = false,
+				terminal_colors = true,
+				-- Background overridden from Monokai Pro's #2d2a2e to #272822.
+				override_palette = function(_)
+					return {
+						background = "#272822",
+					}
+				end,
+				-- Italics matched to the VSCode token customizations: comments,
+				-- keywords, class/type names, storage modifiers, the class keyword.
+				styles = {
+					comment = { italic = true },
+					keyword = { italic = true },
+					type = { italic = true },
+					storageclass = { italic = true },
+					structure = { italic = true },
+					parameter = { italic = false },
+					annotation = { italic = false },
+					tag_attribute = { italic = true },
 				},
 			})
-			local palette = require("catppuccin.palettes").get_palette("mocha")
 
-			vim.cmd.colorscheme("catppuccin-mocha")
+			vim.api.nvim_create_autocmd("ColorScheme", {
+				pattern = "monokai-pro",
+				callback = function()
+					-- VSCode also italicizes "constant" (numbers, booleans, language
+					-- constants like this/super). monokai-pro exposes no style key for
+					-- these, so flip italic on the resolved groups (preserving color).
+					local italic_groups = {
+						"Constant",
+						"Boolean",
+						"Number",
+						"Float",
+						"@constant",
+						"@constant.builtin",
+						"@boolean",
+						"@number",
+						"@variable.builtin",
+					}
+					for _, g in ipairs(italic_groups) do
+						local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = g, link = false })
+						if ok and hl then
+							hl.italic = true
+							pcall(vim.api.nvim_set_hl, 0, g, hl)
+						end
+					end
 
-			vim.api.nvim_set_hl(0, "BlinkCmpMenu", { bg = palette.base })
-			vim.api.nvim_set_hl(0, "BlinkCmpMenuBorder", { fg = palette.blue })
-			vim.api.nvim_set_hl(0, "BlinkCmpDoc", { bg = palette.base })
-			vim.api.nvim_set_hl(0, "BlinkCmpDocBorder", { fg = palette.blue })
-			vim.api.nvim_set_hl(0, "BlinkCmpSignatureHelp", { bg = palette.base })
-			vim.api.nvim_set_hl(0, "BlinkCmpSignatureHelpBorder", { fg = palette.blue })
-			vim.api.nvim_set_hl(0, "BlinkCmpDocSeparator", { fg = palette.blue, bg = palette.base })
-			vim.api.nvim_set_hl(0, "BlinkCmpGhostText", { fg = palette.overlay2 })
+					-- Replace any remaining #2d2a2e with #272822 across every group
+					-- (catches floats/menus/plugin groups not driven by the palette).
+					local OLD, NEW = 0x2d2a2e, 0x272822
+					for name, _ in pairs(vim.api.nvim_get_hl(0, {})) do
+						local hl = vim.api.nvim_get_hl(0, { name = name, link = false })
+						local changed = false
+						if hl.bg == OLD then
+							hl.bg = NEW
+							changed = true
+						end
+						if hl.fg == OLD then
+							hl.fg = NEW
+							changed = true
+						end
+						if hl.sp == OLD then
+							hl.sp = NEW
+							changed = true
+						end
+						if changed then
+							pcall(vim.api.nvim_set_hl, 0, name, hl)
+						end
+					end
+				end,
+			})
 
-			-- Hide all semantic highlights until upstream issues are resolved (https://github.com/catppuccin/nvim/issues/480)
-			for _, group in ipairs(vim.fn.getcompletion("@lsp", "highlight")) do
-				vim.api.nvim_set_hl(0, group, {})
-			end
+			vim.cmd.colorscheme("monokai-pro")
 		end,
 	},
 }
-
--- 	rosewater = "#f4dbd6",
--- 	flamingo = "#f0c6c6",
--- 	pink = "#f5bde6",
--- 	mauve = "#c6a0f6",
--- 	red = "#ed8796",
--- 	maroon = "#ee99a0",
--- 	peach = "#f5a97f",
--- 	yellow = "#eed49f",
--- 	green = "#a6da95",
--- 	teal = "#8bd5ca",
--- 	sky = "#91d7e3",
--- 	sapphire = "#7dc4e4",
--- 	blue = "#8aadf4",
--- 	lavender = "#b7bdf8",
--- 	text = "#cad3f5",
--- 	subtext1 = "#b8c0e0",
--- 	subtext0 = "#a5adcb",
--- 	overlay2 = "#939ab7",
--- 	overlay1 = "#8087a2",
--- 	overlay0 = "#6e738d",
--- 	surface2 = "#5b6078",
--- 	surface1 = "#494d64",
--- 	surface0 = "#363a4f",
--- 	base = "#24273a",
--- 	mantle = "#1e2030",
--- 	crust = "#181926",
---#919ABA
