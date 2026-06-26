@@ -140,24 +140,34 @@ return {
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
-			-- Setup each LSP server. We merge in any server-specific capabilities by passing
-			-- the existing config.capabilities to blink.cmp.get_lsp_capabilities.
+			-- Setup each LSP server via the native vim.lsp.config API.
+			-- The old `require("lspconfig")[name].setup{}` "framework" is deprecated on
+			-- Nvim 0.11+ (removed in lspconfig v3.0.0); per-server defaults now ship in
+			-- lspconfig's `lsp/` dir and are auto-merged by vim.lsp.config(). We only
+			-- override the fields we customize, then enable the server ourselves.
 			for name, config in pairs(servers) do
-				require("lspconfig")[name].setup({
-					autostart = config.autostart,
+				vim.lsp.config(name, {
 					cmd = config.cmd,
 					capabilities = capabilities,
 					filetypes = config.filetypes,
-					handlers = vim.tbl_deep_extend("force", {}, config.handlers or {}),
+					handlers = config.handlers,
 					on_attach = config.on_attach or on_attach,
 					settings = config.settings,
 					root_dir = config.root_dir,
 				})
+				-- `autostart = false` (eslint) maps to "configured but not enabled":
+				-- it won't attach automatically but can still be started manually.
+				if config.autostart ~= false then
+					vim.lsp.enable(name)
+				end
 			end
 
 			-- Setup Mason for managing external LSP servers
 			require("mason").setup({ ui = { border = "rounded" } })
-			require("mason-lspconfig").setup()
+			-- Disable automatic_enable: newer mason-lspconfig calls vim.lsp.enable() for
+			-- every installed server, which bypasses the per-server setup() below (and our
+			-- eslint autostart = false). We enable servers ourselves in the loop above.
+			require("mason-lspconfig").setup({ automatic_enable = false })
 
 			-- Configure borders for LspInfo UI and diagnostics
 			require("lspconfig.ui.windows").default_options.border = "rounded"
